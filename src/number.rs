@@ -83,6 +83,10 @@ macro_rules! parse_unsigned_from_str {
                 .map_err(|_| CoreUtilsError::ConversionError(format!("cannot convert imm {imm} to {} then to {}", stringify!($signed), stringify!($unsigned))))?;
             Ok(i as $unsigned)
         }
+        else if imm.starts_with("'") && imm.ends_with("'") && imm.len() == 3 {  // convert char to unsigned
+            let chars: Vec<char> = imm.chars().collect();
+            Ok(chars[1] as $unsigned)
+        }
         else {
             let i = <$unsigned>::from_str_radix(&imm, 10)
                 .map_err(|_| CoreUtilsError::ConversionError(format!("cannot convert imm {imm} to {}", stringify!($unsigned))))?;
@@ -125,37 +129,8 @@ pub fn get_u64_from_str(imm:&str) -> Result<u64, CoreUtilsError> {
 }
 
 pub fn get_i64_from_str(imm:&str) -> Result<i64, CoreUtilsError> {
-    let imm = imm.replace("_", "");
-    if imm.starts_with("0x") {
-        let hex_trimmed = imm.trim_start_matches("0x");
-        let i = i64::from_str_radix(&hex_trimmed, 16)
-            .map_err(|_| CoreUtilsError::ConversionError(format!("cannot convert imm {imm} to i64")))?;
-        Ok(i)
-    }
-    else if imm.starts_with("0b") {
-        let bin_trimmed = imm.trim_start_matches("0b");
-        let i = i64::from_str_radix(&bin_trimmed, 2)
-            .map_err(|_| CoreUtilsError::ConversionError(format!("cannot convert imm {imm} to i64")))?;
-        Ok(i)
-    }
-    else if imm.starts_with("0o") {
-        let oct_trimmed = imm.trim_start_matches("0o");
-        let i = i64::from_str_radix(&oct_trimmed, 8)
-            .map_err(|_| CoreUtilsError::ConversionError(format!("cannot convert imm {imm} to i64")))?;
-        Ok(i)
-    }
-    else if imm.starts_with("-"){
-        let i = i64::from_str_radix(&imm, 10)
-            .map_err(|_| CoreUtilsError::ConversionError(format!("cannot convert imm {imm} to i64")))?;
-        Ok(i)
-    }
-    else if imm.starts_with("'") && imm.ends_with("'") && imm.len() == 3 {  // convert char to i64
-        let chars: Vec<char> = imm.chars().collect();
-        Ok(chars[1] as i64)
-    }
-    else {
-        parse_signed_from_str!(imm, i64)
-    }
+    get_u64_from_str(imm)
+        .map(|u| u as i64)
 }
 
 pub fn get_u32_from_str(imm:&str) -> Result<u32, CoreUtilsError> {
