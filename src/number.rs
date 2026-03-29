@@ -40,6 +40,12 @@ pub fn u8_array_to_u32_little_endian(data: &[u8]) -> Result<u32, &'static str> {
     Ok(result)
 }
 
+/// check if a signed integer can fit in i32
+pub fn can_fits_in_32bit(x: i64) -> bool {
+    (x >= i32::MIN as i64 && x <= i32::MAX as i64) || 
+    (x >= u32::MIN as i64 && x <= u32::MAX as i64)
+}
+
 pub fn u32_to_base26(mut number: u32) -> String {
     if number == 0 {
         return "A".to_string();
