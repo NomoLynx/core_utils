@@ -14,7 +14,7 @@ pub fn debug_string(data: String) {
             let line = location.line();
             let s = format!("Debug ({file}:{line}:0): {data}");
             log::debug!("{}", s);
-            println!("{}", Color::Blue.paint(s))
+            eprintln!("{}", Color::Blue.paint(s))
         }
     }
 }
@@ -31,7 +31,7 @@ pub fn warn_string(data: String) {
     let line = location.line();
     let s = format!("Warning ({file}:{line}:0): {data}");
     log::warn!("{}", s);
-    println!("{}", Color::Yellow.paint(s))
+    eprintln!("{}", Color::Yellow.paint(s))
 }
 
 pub fn output_str(data: &str) {
@@ -51,7 +51,7 @@ pub fn error_string(data: String) {
     let line = location.line();
     let s = format!("Error ({file}:{line}:0): {}", data);
     log::error!("{}", s);
-    println!("{}", Color::Red.paint(s))
+    eprintln!("{}", Color::Red.paint(s))
 }
 
 pub fn error_str(data: &str) {
