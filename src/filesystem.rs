@@ -5,6 +5,18 @@ use std::{
 };
 use xml::{reader::XmlEvent, EventReader};
 
+/// Converts a file path to a file URI format.
+pub fn to_file_uri(path: &str) -> String {
+    let p = std::path::Path::new(path)
+        .canonicalize()
+        .unwrap_or_else(|_| std::path::PathBuf::from(path));
+
+    let p = p.to_string_lossy().replace("\\", "/");
+
+    format!("file:///{}", p)
+}
+
+/// Extracts the file extension from a given file path, returning it as an Option<&str>.
 pub fn get_file_extension(file_path: &str) -> Option<&str> {
     if let Some(extension) = Path::new(file_path).extension() {
         extension.to_str()
@@ -13,6 +25,7 @@ pub fn get_file_extension(file_path: &str) -> Option<&str> {
     }
 }
 
+/// Extracts the file name without its extension from a given file path, returning it as an Option<String>.
 pub fn get_file_name_without_extension(file_path: &str) -> Option<String> {
     std::path::Path::new(file_path)
         .file_stem()
