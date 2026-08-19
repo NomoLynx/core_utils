@@ -13,6 +13,7 @@ pub mod file_object;
 pub mod tree;
 pub mod log;
 pub mod history_var;
+pub mod egraph;
 
 pub mod traits {
     pub mod generate_code;
