@@ -1,7 +1,9 @@
 pub fn string_to_bool(str:&str) -> bool {
-    match str.to_lowercase().as_str() {
+    match str.to_lowercase().trim() {
+        "y" |
         "yes"|
         "true" => true,
+        "n" |
         "no" |
         "false" => false,
         _ => false,
