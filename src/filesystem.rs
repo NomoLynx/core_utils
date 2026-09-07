@@ -35,18 +35,17 @@ pub fn get_file_name_without_extension(file_path: &str) -> Option<String> {
 
 /// Replaces the file extension of the given file path with a new extension, 
 /// returning the new file path as an Option<String>.
-pub fn replace_file_extension(file_path: &str, new_extension: &str) -> Option<String> {
-    let path = Path::new(file_path);
-    if let Some(stem) = path.file_stem().and_then(|s| s.to_str()) {
-        let new_file_name = format!("{}.{}", stem, new_extension);
-        if let Some(parent) = path.parent().and_then(|p| p.to_str()) {
-            return Some(Path::new(parent).join(new_file_name).to_string_lossy().to_string());
-        } else {
-            return Some(new_file_name);
-        }
-    }
+pub fn replace_file_extension(file_path: &str, new_extension: &str) -> PathBuf {
+    let path = PathBuf::from(file_path);
+    replace_extension(path, new_extension)
+}
 
-    None
+/// Replaces the extension of the given PathBuf with the specified extension.
+/// Returns the new PathBuf with the updated extension.
+pub fn replace_extension(path: PathBuf, extension: &str) -> PathBuf {
+    let mut new_path = path;
+    new_path.set_extension(extension);
+    new_path
 }
 
 /// Recursively get total size of a folder in bytes
@@ -187,6 +186,30 @@ pub fn read_xml_string(file_path: &Path, target_node: &str) -> Option<String> {
     }
 
     None
+}
+
+/// Determines whether the output file needs to be regenerated based on the modification times of the input and output files. 
+/// Returns `true` if the output file does not exist or if the input file has been modified more recently than the output file.
+pub fn needs_generation(input: &Path, output: &Path) -> bool {
+    if !output.exists() {
+        return true;
+    }
+
+    let input_time = fs::metadata(input)
+        .unwrap()
+        .modified()
+        .unwrap();
+
+    let output_time = fs::metadata(output)
+        .unwrap()
+        .modified()
+        .unwrap();
+
+    input_time > output_time
+}
+
+pub fn write_to_file_from_pathbuff(path: &PathBuf, content: &str) -> std::io::Result<()> {
+    write_to_file(&path.to_string_lossy(), content)
 }
 
 pub fn write_to_file(file_name: &str, content: &str) -> std::io::Result<()> {
