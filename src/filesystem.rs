@@ -33,6 +33,40 @@ pub fn get_file_name_without_extension(file_path: &str) -> Option<String> {
         .map(|x| x.to_string())
 }
 
+/// Replaces the file extension of the given file path with a new extension, 
+/// returning the new file path as an Option<String>.
+pub fn replace_file_extension(file_path: &str, new_extension: &str) -> Option<String> {
+    let path = Path::new(file_path);
+    if let Some(stem) = path.file_stem().and_then(|s| s.to_str()) {
+        let new_file_name = format!("{}.{}", stem, new_extension);
+        if let Some(parent) = path.parent().and_then(|p| p.to_str()) {
+            return Some(Path::new(parent).join(new_file_name).to_string_lossy().to_string());
+        } else {
+            return Some(new_file_name);
+        }
+    }
+
+    None
+}
+
+/// Recursively get total size of a folder in bytes
+pub fn folder_size<P: AsRef<Path>>(path: P) -> u64 {
+    let mut total: u64 = 0;
+    if let Ok(entries) = fs::read_dir(path) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_file() {
+                if let Ok(metadata) = fs::metadata(&path) {
+                    total += metadata.len();
+                }
+            } else if path.is_dir() {
+                total += folder_size(path);
+            }
+        }
+    }
+    total
+}
+
 pub fn get_file_containing_folder(file_path: &str) -> Option<String> {
     std::path::Path::new(file_path)
         .parent()
