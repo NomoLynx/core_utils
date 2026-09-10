@@ -1,7 +1,5 @@
 use std::{
-    fs::{self, File, OpenOptions},
-    io::{BufReader, Write},
-    path::{Path, PathBuf},
+    collections::HashSet, ffi::OsStr, fs::{self, File, OpenOptions}, io::{self, BufReader, Write}, path::{Path, PathBuf}
 };
 use xml::{reader::XmlEvent, EventReader};
 
@@ -33,7 +31,7 @@ pub fn get_file_name_without_extension(file_path: &str) -> Option<String> {
         .map(|x| x.to_string())
 }
 
-/// Replaces the file extension of the given file path with a new extension, 
+/// Replaces the file extension of the given file path with a new extension,
 /// returning the new file path as an Option<String>.
 pub fn replace_file_extension(file_path: &str, new_extension: &str) -> PathBuf {
     let path = PathBuf::from(file_path);
@@ -64,6 +62,41 @@ pub fn folder_size<P: AsRef<Path>>(path: P) -> u64 {
         }
     }
     total
+}
+
+// Example:
+// let size = folder_size_excluding("C:/MyCode/Rust/visualize", &[".git", "target"])?;
+// println!("Size (bytes): {}", size);
+pub fn folder_size_excluding<P: AsRef<Path>>(root: P, excluded_names: &[&str]) -> io::Result<u64> {
+    let excluded: HashSet<&str> = excluded_names.iter().copied().collect();
+    walk(root.as_ref(), &excluded)
+}
+
+fn walk(path: &Path, excluded: &HashSet<&str>) -> io::Result<u64> {
+    let mut total = 0u64;
+
+    for entry_result in std::fs::read_dir(path)? {
+        let entry = entry_result?;
+        let file_type = entry.file_type()?;
+        let name = entry.file_name();
+
+        if file_type.is_dir() {
+            if should_exclude(&name, excluded) {
+                continue;
+            }
+            total += walk(&entry.path(), excluded)?;
+        } else if file_type.is_file() {
+            total += entry.metadata()?.len();
+        } else if file_type.is_symlink() {
+            continue;
+        }
+    }
+
+    Ok(total)
+}
+
+fn should_exclude(name: &OsStr, excluded: &HashSet<&str>) -> bool {
+    name.to_str().map(|s| excluded.contains(s)).unwrap_or(false)
 }
 
 pub fn get_file_containing_folder(file_path: &str) -> Option<String> {
@@ -188,22 +221,16 @@ pub fn read_xml_string(file_path: &Path, target_node: &str) -> Option<String> {
     None
 }
 
-/// Determines whether the output file needs to be regenerated based on the modification times of the input and output files. 
+/// Determines whether the output file needs to be regenerated based on the modification times of the input and output files.
 /// Returns `true` if the output file does not exist or if the input file has been modified more recently than the output file.
 pub fn needs_generation(input: &Path, output: &Path) -> bool {
     if !output.exists() {
         return true;
     }
 
-    let input_time = fs::metadata(input)
-        .unwrap()
-        .modified()
-        .unwrap();
+    let input_time = fs::metadata(input).unwrap().modified().unwrap();
 
-    let output_time = fs::metadata(output)
-        .unwrap()
-        .modified()
-        .unwrap();
+    let output_time = fs::metadata(output).unwrap().modified().unwrap();
 
     input_time > output_time
 }
@@ -218,7 +245,10 @@ pub fn write_to_file(file_name: &str, content: &str) -> std::io::Result<()> {
     Ok(())
 }
 
-pub fn write_to_file_option(file_name_option: Option<&String>, content: &str) -> std::io::Result<()> {
+pub fn write_to_file_option(
+    file_name_option: Option<&String>,
+    content: &str,
+) -> std::io::Result<()> {
     if let Some(file_name) = file_name_option {
         write_to_file(file_name, content)?;
     }
@@ -234,7 +264,10 @@ pub fn append_to_file(file_name: &str, content: &str) -> std::io::Result<()> {
     Ok(())
 }
 
-pub fn append_to_file_option(file_name_option: Option<&String>, content: &str) -> std::io::Result<()> {
+pub fn append_to_file_option(
+    file_name_option: Option<&String>,
+    content: &str,
+) -> std::io::Result<()> {
     if let Some(file_name) = file_name_option {
         append_to_file(file_name, content)?;
     }
