@@ -96,7 +96,9 @@ fn walk(path: &Path, excluded: &HashSet<&str>) -> io::Result<u64> {
 }
 
 fn should_exclude(name: &OsStr, excluded: &HashSet<&str>) -> bool {
-    name.to_str().map(|s| excluded.contains(s)).unwrap_or(false)
+    name.to_str()
+        .map(|s| excluded.contains(s))
+        .unwrap_or(false)
 }
 
 pub fn get_file_containing_folder(file_path: &str) -> Option<String> {
