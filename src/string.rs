@@ -40,3 +40,27 @@ pub fn vna_hash(version: &str) -> u32 {
 
     h
 }
+
+/// Sanitizes a string to be a valid symbol by replacing non-alphanumeric characters with underscores.
+/// If the resulting string is empty, it returns "sym".
+/// If the resulting string starts with a digit, it prepends an underscore.
+pub fn sanitize_symbol(input: &str) -> String {
+    let mut out = String::with_capacity(input.len());
+    for c in input.chars() {
+        if c.is_ascii_alphanumeric() || c == '_' {
+            out.push(c);
+        } else {
+            out.push('_');
+        }
+    }
+
+    if out.is_empty() {
+        return "sym".to_string();
+    }
+
+    if out.chars().next().is_some_and(|c| c.is_ascii_digit()) {
+        format!("_{}", out)
+    } else {
+        out
+    }
+}
