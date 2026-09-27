@@ -166,3 +166,29 @@ pub fn get_u8_from_str(imm:&str) -> Result<u8, CoreUtilsError> {
 pub fn get_i128_from_str(imm:&str) -> Result<i128, CoreUtilsError> {
     parse_signed_from_str!(imm, i128)
 }
+
+pub fn get_f32_from_str(imm:&str) -> Result<f32, CoreUtilsError> {
+    let imm = imm.replace("_", "");
+    imm.parse::<f32>()
+        .map_err(|_| CoreUtilsError::ConversionError(format!("cannot convert imm {imm} to f32")))
+}
+
+pub fn get_f64_from_str(imm:&str) -> Result<f64, CoreUtilsError> {
+    let imm = imm.replace("_", "");
+    imm.parse::<f64>()
+        .map_err(|_| CoreUtilsError::ConversionError(format!("cannot convert imm {imm} to f64")))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parses_floats() {
+        assert_eq!(get_f32_from_str("3.5").unwrap(), 3.5_f32);
+        assert_eq!(get_f64_from_str("2.25").unwrap(), 2.25_f64);
+        assert_eq!(get_f32_from_str("1_000.5").unwrap(), 1000.5_f32);
+        assert!(get_f32_from_str("not-a-number").is_err());
+        assert_eq!(get_f64_from_str("1.0005e3").unwrap(), 1000.5_f64);
+    }
+}
