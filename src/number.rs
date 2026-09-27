@@ -162,3 +162,7 @@ pub fn get_u16_from_str(imm:&str) -> Result<u16, CoreUtilsError> {
 pub fn get_u8_from_str(imm:&str) -> Result<u8, CoreUtilsError> {
     parse_unsigned_from_str!(imm, u8, i8)
 }
+
+pub fn get_i128_from_str(imm:&str) -> Result<i128, CoreUtilsError> {
+    parse_signed_from_str!(imm, i128)
+}
