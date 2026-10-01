@@ -73,7 +73,8 @@ pub fn u32_to_base26(mut number: u32) -> String {
 
 macro_rules! parse_unsigned_from_str {
     ($imm:expr, $unsigned:ty, $signed:ty) => {{
-        let imm = $imm.replace("_", "");
+        let imm = $imm.trim()
+                      .replace("_", "");
         if imm.starts_with("0x") {
             let hex_trimmed = imm.trim_start_matches("0x");
             let i = <$unsigned>::from_str_radix(hex_trimmed, 16)
@@ -111,7 +112,8 @@ macro_rules! parse_unsigned_from_str {
 
 macro_rules! parse_signed_from_str {
     ($imm:expr, $signed:ty) => {{
-        let imm = $imm.replace("_", "");
+        let imm = $imm.trim()
+                      .replace("_", "");
         if imm.starts_with("0x") {
             let hex_trimmed = imm.trim_start_matches("0x");
             let i = <$signed>::from_str_radix(hex_trimmed, 16)
