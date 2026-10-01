@@ -1,5 +1,6 @@
 use std::fmt::Display;
 
+#[derive(Clone)]
 pub struct FileObject {
     file_name: String,
     file_extension : String,
