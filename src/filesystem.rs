@@ -105,7 +105,8 @@ pub fn get_file_containing_folder(file_path: &str) -> Option<String> {
     std::path::Path::new(file_path)
         .parent()
         .and_then(|parent| parent.to_str())
-        .map(|s| s.to_string())
+        .map(|s| if s.is_empty() { ".".to_string() } 
+                        else { s.to_string() })
 }
 
 pub fn get_files_in_folder(folder_path: &str, extension_str: &str) -> Vec<String> {
