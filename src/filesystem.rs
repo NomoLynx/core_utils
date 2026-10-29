@@ -301,6 +301,13 @@ pub fn append_to_file_option(
     Ok(())
 }
 
+pub fn delete_file_path(path: &Path) -> std::io::Result<()> {
+    if path.exists() {
+        fs::remove_file(path)?;
+    }
+    Ok(())
+}
+
 pub fn delete_file_option(file_name_option: Option<&String>) -> std::io::Result<()> {
     if let Some(file_name) = file_name_option {
         if Path::new(file_name).exists() {
