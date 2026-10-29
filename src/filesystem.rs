@@ -243,7 +243,15 @@ pub fn write_to_file_from_pathbuff(path: &PathBuf, content: &str) -> std::io::Re
 }
 
 pub fn write_to_file(file_name: &str, content: &str) -> std::io::Result<()> {
-    let mut file = File::create(file_name)?;
+    let file_path = Path::new(file_name);
+
+    if let Some(parent) = file_path.parent() {
+        if !parent.as_os_str().is_empty() && !parent.exists() {
+            fs::create_dir_all(parent)?;
+        }
+    }
+
+    let mut file = File::create(file_path)?;
     file.write_all(content.as_bytes())?;
     Ok(())
 }
