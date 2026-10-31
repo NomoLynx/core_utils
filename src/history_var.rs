@@ -143,7 +143,7 @@ impl<T: Clone> HistoryVariable<T> {
 
     /// Remove ALL changes by a specific setter ID
     pub fn remove_all_changes_by_setter(&mut self, setter_id: usize) -> Result<usize, String> {
-        let initial_len = self.history.len();
+        let _initial_len = self.history.len();
 
         // Keep only entries that are NOT from this setter (except initial value at index 0)
         let mut new_history = VecDeque::new();
@@ -310,29 +310,3 @@ mod tests {
     }
 }
 
-// Example usage
-fn sample_usage() {
-    let mut config_value = HistoryVariable::new("initial".to_string(), 0, 50);
-
-    config_value.set("value_a".to_string(), 1001, Some("User 1001 change"));
-    config_value.set("value_b".to_string(), 1002, Some("User 1002 change"));
-    config_value.set("value_c".to_string(), 1001, Some("User 1001 again"));
-    config_value.set("value_d".to_string(), 1003, Some("User 1003 change"));
-
-    println!("Current value: {}", config_value.get());
-
-    // Remove user 1001's most recent change (preserves order)
-    if let Ok(_) = config_value.remove_change_by_setter(1001) {
-        println!("After removing user 1001's change: {}", config_value.get());
-    }
-    // Print remaining history
-    for entry in config_value.get_history() {
-        println!(
-            "Entry {}: User {} set '{}' ({})",
-            entry.entry_id,
-            entry.setter_id,
-            entry.value,
-            entry.reason.as_deref().unwrap_or("No reason")
-        );
-    }
-}
