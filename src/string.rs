@@ -64,3 +64,23 @@ pub fn sanitize_symbol(input: &str) -> String {
         out
     }
 }
+
+/// Make text safe inside a quoted Mermaid label, and cap its length.
+pub fn escape_mermaid_label(s: &str) -> String {
+    const MAX: usize = 40;
+    let mut out = String::new();
+    for (i, ch) in s.chars().enumerate() {
+        if i >= MAX {
+            out.push('…');
+            break;
+        }
+        match ch {
+            '"' => out.push_str("#quot;"),
+            '<' => out.push_str("#lt;"),
+            '>' => out.push_str("#gt;"),
+            '\n' | '\r' | '\t' => out.push(' '),
+            c => out.push(c),
+        }
+    }
+    out
+}
