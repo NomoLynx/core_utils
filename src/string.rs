@@ -84,3 +84,29 @@ pub fn escape_mermaid_label(s: &str) -> String {
     }
     out
 }
+
+pub fn is_i64(s: &str) -> bool {
+    let s = s.trim();
+
+    if s.is_empty() {
+        return false;
+    }
+
+    let bytes = s.as_bytes();
+
+    // Optional leading '-'
+    let start = if bytes[0] == b'-' { 1 } else { 0 };
+
+    if start == bytes.len() {
+        return false;
+    }
+
+    // Digits only
+    if !bytes[start..].iter().all(|b| b.is_ascii_digit()) {
+        return false;
+    }
+
+    // Range check
+    s.parse::<i64>().is_ok()
+}
+
