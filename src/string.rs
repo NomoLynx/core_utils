@@ -110,3 +110,13 @@ pub fn is_i64(s: &str) -> bool {
     s.parse::<i64>().is_ok()
 }
 
+/// Capitalizes the first character of the given string. 
+/// If the string is empty, returns an empty string.
+pub fn capitalize_first(s: &str) -> String {
+    let mut c = s.chars();
+    match c.next() {
+        None => String::new(),
+        Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
+    }
+}
+
