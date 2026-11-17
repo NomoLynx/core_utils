@@ -1,11 +1,7 @@
-pub fn string_to_bool(str:&str) -> bool {
+pub fn string_to_bool(str: &str) -> bool {
     match str.to_lowercase().trim() {
-        "y" |
-        "yes"|
-        "true" => true,
-        "n" |
-        "no" |
-        "false" => false,
+        "y" | "yes" | "true" => true,
+        "n" | "no" | "false" => false,
         _ => false,
     }
 }
@@ -110,13 +106,41 @@ pub fn is_i64(s: &str) -> bool {
     s.parse::<i64>().is_ok()
 }
 
-/// Capitalizes the first character of the given string. 
-/// If the string is empty, returns an empty string.
-pub fn capitalize_first(s: &str) -> String {
-    let mut c = s.chars();
-    match c.next() {
-        None => String::new(),
-        Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
+/// Capitalizes a string using one of two behaviors controlled by `first_alphabetic`:
+/// - `false`: capitalize only the first character.
+/// - `true`: capitalize the first alphabetic character (useful for identifier-like values).
+///
+/// Examples:
+/// - `capitalize_first("hello", false)` -> `Hello`
+/// - `capitalize_first("_my_type", true)` -> `_My_type`
+pub fn capitalize_first(s: &str, first_alphabetic: bool) -> String {
+    if s.is_empty() {
+        return String::new();
+    }
+
+    if !first_alphabetic {
+        let mut c = s.chars();
+        return match c.next() {
+            None => String::new(),
+            Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
+        };
+    }
+
+    let first_alpha = s.char_indices().find(|(_, ch)| ch.is_alphabetic());
+
+    match first_alpha {
+        None => s.to_string(),
+        Some((idx, ch)) => {
+            let mut out = String::with_capacity(s.len());
+            out.push_str(&s[..idx]);
+            out.extend(ch.to_uppercase());
+            out.push_str(&s[idx + ch.len_utf8()..]);
+            out
+        }
     }
 }
 
+/// Wrapper that capitalizes the first alphabetic character.
+pub fn capitalize_first_identifier(s: &str) -> String {
+    capitalize_first(s, true)
+}
