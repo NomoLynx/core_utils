@@ -14,6 +14,7 @@ pub mod tree;
 pub mod log;
 pub mod history_var;
 pub mod egraph;
+pub mod indexed_store;
 
 pub mod traits {
     pub mod generate_code;
