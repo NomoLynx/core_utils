@@ -1,3 +1,8 @@
+/// Utility functions for string manipulation and processing.
+
+/// Converts a string to a boolean value.
+/// Recognizes "y", "yes", "true" as true, and "n", "no", "false" as false.
+/// Any other value defaults to false.
 pub fn string_to_bool(str: &str) -> bool {
     match str.to_lowercase().trim() {
         "y" | "yes" | "true" => true,
@@ -6,6 +11,12 @@ pub fn string_to_bool(str: &str) -> bool {
     }
 }
 
+/// Generates a string with escape sequences for special characters like newline, tab, and quotes.
+///
+/// Examples:
+/// - `"Hello\nWorld"` -> `"Hello\\nWorld"`
+/// - `"Tab\tCharacter"` -> `"Tab\\tCharacter"`
+/// - `"Quote\"Test"` -> `"Quote\\\"Test"`
 pub fn generate_escape_string(s: &str) -> String {
     let mut result = String::new();
     for c in s.chars() {
@@ -20,6 +31,19 @@ pub fn generate_escape_string(s: &str) -> String {
         }
     }
     result
+}
+
+/// Normalizes enum lookup keys by removing non-alphanumeric characters and
+/// lowercasing the remaining text.
+///
+/// Examples:
+/// - `"a.b"` -> `"ab"`
+/// - `"A-B_C"` -> `"abc"`
+pub fn normalize_enum_lookup_key(s: &str) -> String {
+    s.chars()
+        .filter(|ch| ch.is_alphanumeric())
+        .flat_map(|ch| ch.to_lowercase())
+        .collect()
 }
 
 /// GNU ELF version hash function used for strings like "GLIBC_2.2.5".
